@@ -1,7 +1,0 @@
-
-T6147.hs:13:32:
-    Couldn't match type ‘Int’ with ‘Foo’
-    arising from the coercion of the method ‘foo’
-      from type ‘Int -> T Int’ to type ‘Foo -> T Foo’
-    Relevant role signatures: type role T nominal
-    When deriving the instance for (C Foo)

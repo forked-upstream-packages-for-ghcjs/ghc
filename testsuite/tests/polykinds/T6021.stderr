@@ -1,4 +1,0 @@
-
-T6021.hs:5:10:
-    Kind variable also used as type variable: ‘b’
-    In an instance declaration

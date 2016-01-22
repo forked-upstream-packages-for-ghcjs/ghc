@@ -1,1 +1,0 @@
-    case ds of _ [Occ=Dead] { Bar dt dt1 -> GHC.Types.I# dt }

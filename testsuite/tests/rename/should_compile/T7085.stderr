@@ -1,3 +1,0 @@
-
-T7085.hs:8:6: Warning:
-    This pattern-binding binds no variables: Nothing = Just n

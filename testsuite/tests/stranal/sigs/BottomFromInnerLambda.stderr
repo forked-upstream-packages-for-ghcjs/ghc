@@ -1,6 +1,0 @@
-
-==================== Strictness signatures ====================
-BottomFromInnerLambda.expensive: <S(S),1*U(U)>m
-BottomFromInnerLambda.f: <S(S),1*U(U)>
-
-

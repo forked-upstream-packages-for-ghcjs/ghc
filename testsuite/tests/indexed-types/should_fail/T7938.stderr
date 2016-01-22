@@ -1,4 +1,0 @@
-
-T7938.hs:12:3:
-    The RHS of an associated type declaration mentions ‘k2’
-      All such variables must be bound on the LHS

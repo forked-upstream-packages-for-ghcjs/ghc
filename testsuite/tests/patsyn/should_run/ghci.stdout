@@ -1,3 +1,0 @@
-pattern Single :: t -> [t] 	-- Defined at <interactive>:4:1
-foo :: [Bool] -> [Bool]
-[False]

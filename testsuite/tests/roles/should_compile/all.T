@@ -1,7 +1,0 @@
-test('Roles1', only_ways('normal'), compile, ['-ddump-tc -fprint-explicit-foralls'])
-test('Roles2', only_ways('normal'), compile, ['-ddump-tc -fprint-explicit-foralls'])
-test('Roles3', only_ways('normal'), compile, ['-ddump-tc'])
-test('Roles4', only_ways('normal'), compile, ['-ddump-tc'])
-test('Roles13', only_ways('normal'), compile, ['-ddump-simpl -dsuppress-uniques'])
-test('Roles14', only_ways('normal'), compile, ['-ddump-tc'])
-test('T8958', [normalise_fun(normalise_errmsg), only_ways('normal')], compile, ['-ddump-tc -dsuppress-uniques'])

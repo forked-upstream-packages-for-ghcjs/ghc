@@ -1,5 +1,0 @@
-
-tcfail209.hs:3:1:
-    Illegal constraint synonym of kind: ‘* -> Constraint’
-      (Use ConstraintKinds to permit this)
-    In the type declaration for ‘Showish’

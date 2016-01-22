@@ -1,4 +1,0 @@
-
-Misplaced.hs:4:1:
-    Misplaced SPECIALISE instance pragma:
-    {-# SPECIALIZE instance Eq (T Int) #-}

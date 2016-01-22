@@ -1,4 +1,0 @@
-
-WildcardInDefaultSignature.hs:4:30:
-    Wildcard not allowed
-    in default signature: ‘_’

@@ -1,4 +1,0 @@
-
-readFail040.hs:7:11:
-    parse error on input ‘<-’
-    Perhaps this statement should be within a 'do' block?

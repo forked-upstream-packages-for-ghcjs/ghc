@@ -1,7 +1,0 @@
-
-Roles10.hs:16:12:
-    Couldn't match representation of type ‘Char’ with that of ‘Bool’
-    arising from the coercion of the method ‘meth’
-      from type ‘Int -> F Int’ to type ‘Age -> F Age’
-    Relevant role signatures: type role F nominal
-    When deriving the instance for (C Age)

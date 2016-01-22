@@ -1,6 +1,0 @@
-
-==================== Tidy Core rules ====================
-"SPEC f" [ALWAYS]
-    forall (@ b) ($dOrd :: Ord [Int]). f @ b @ [Int] $dOrd = f_$sf @ b
-
-

@@ -1,5 +1,8 @@
 {-# LANGUAGE CPP, MagicHash, UnboxedTuples, NoImplicitPrelude #-}
 {-# OPTIONS_HADDOCK hide #-}
+#ifdef ghcjs_HOST_OS
+{-# LANGUAGE JavaScriptFFI, UnliftedFFITypes #-}
+#endif
 
 #include "MachDeps.h"
 
@@ -21,13 +24,54 @@ import GHC.Prim
 import GHC.Types (isTrue#)
 import GHC.Integer.Type
 
+#if defined(ghcjs_HOST_OS)
+
+foreign import javascript unsafe
+  "h$integer_wordLog2($1)"
+  wordLog2# :: Word# -> Int#
+
+foreign import javascript unsafe
+  "h$integer_integerLog2($1)"
+  js_integerLog2 :: ByteArray# -> Int#
+
+foreign import javascript unsafe
+  "$r1 = h$integer_integerLog2IsPowerOf2($1); $r2 = h$ret1;"
+  js_integerLog2IsPowerOf2 :: ByteArray# -> (# Int#, Int# #)
+
+foreign import javascript unsafe
+  "$r1 = h$integer_intLog2IsPowerOf2($1); $r2 = h$ret1;"
+  js_intLog2IsPowerOf2 :: Int# -> (# Int#, Int# #)
+
+foreign import javascript unsafe
+  "h$integer_roundingMode($1,$2)"
+  js_roundingMode :: ByteArray# -> Int# -> Int#
+
+integerLog2# :: Integer -> Int#
+integerLog2# (S# i)    = wordLog2# (int2Word# i)
+integerLog2# (J# _ ba) = js_integerLog2 ba
+
+integerLog2IsPowerOf2# :: Integer -> (# Int#, Int# #)
+integerLog2IsPowerOf2# (S# i)    = js_intLog2IsPowerOf2 i
+integerLog2IsPowerOf2# (J# _ ba) = js_integerLog2IsPowerOf2 ba
+
+roundingMode# :: Integer -> Int# -> Int#
+roundingMode# (S# i) t =
+    case int2Word# i `and#` ((uncheckedShiftL# 2## t) `minusWord#` 1##) of
+      k -> case uncheckedShiftL# 1## t of
+            c -> if isTrue# (c `gtWord#` k)
+                    then 0#
+                    else if isTrue# (c `ltWord#` k)
+                            then 2#
+                            else 1#
+roundingMode# (J# _ ba) t = js_roundingMode ba t
+
 -- When larger word sizes become common, add support for those,
 -- it is not hard, just tedious.
-#if (WORD_SIZE_IN_BITS != 32) && (WORD_SIZE_IN_BITS != 64)
+#elif ((WORD_SIZE_IN_BITS != 32) && (WORD_SIZE_IN_BITS != 64))
 
 -- Less than ideal implementations for strange word sizes
 
-import GHC.Integer
+-- import GHC.Integer
 
 default ()
 

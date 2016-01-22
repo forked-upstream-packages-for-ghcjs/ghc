@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -100,6 +101,28 @@ getGCStats = do
     "getGCStats: GC stats not enabled. Use `+RTS -T -RTS' to enable them."
     Nothing
     Nothing
+##ifdef ghcjs_HOST_OS
+  allocaBytes 144 $ \p -> do
+    getGCStats_ p
+    bytesAllocated <- peekByteOff p 0
+    numGcs <- peekByteOff p 8
+    numByteUsageSamples <- peekByteOff p 16
+    maxBytesUsed <- peekByteOff p 24
+    cumulativeBytesUsed <- peekByteOff p 32
+    bytesCopied <- peekByteOff p 40
+    currentBytesUsed <- peekByteOff p 48
+    currentBytesSlop <- peekByteOff p 56
+    maxBytesSlop <- peekByteOff p 64
+    peakMegabytesAllocated <- peekByteOff p 72
+    mutatorCpuSeconds <- peekByteOff p 80
+    mutatorWallSeconds <- peekByteOff p 88
+    gcCpuSeconds <- peekByteOff p 96
+    gcWallSeconds <- peekByteOff p 104
+    cpuSeconds <- peekByteOff p 112
+    wallSeconds <- peekByteOff p 120
+    parTotBytesCopied <- peekByteOff p 128
+    parMaxBytesCopied <- peekByteOff p 136
+##else
   allocaBytes (#size GCStats) $ \p -> do
     getGCStats_ p
     bytesAllocated <- (# peek GCStats, bytes_allocated) p
@@ -124,6 +147,7 @@ getGCStats = do
     wallSeconds <- (# peek GCStats, wall_seconds) p
     parTotBytesCopied <- (# peek GCStats, par_tot_bytes_copied) p
     parMaxBytesCopied <- (# peek GCStats, par_max_bytes_copied) p
+##endif
     return GCStats { .. }
 
 {-

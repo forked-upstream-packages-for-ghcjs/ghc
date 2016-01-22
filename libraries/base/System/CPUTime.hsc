@@ -24,6 +24,14 @@ module System.CPUTime
          cpuTimePrecision  -- :: Integer
         ) where
 
+##ifdef ghcjs_HOST_OS
+getCPUTime :: IO Integer
+getCPUTime = return 0
+
+cpuTimePrecision :: Integer
+cpuTimePrecision = 1
+##else
+
 import Data.Ratio
 
 import Foreign
@@ -159,3 +167,4 @@ foreign import ccall unsafe clk_tck :: CLong
 
 clockTicks :: Int
 clockTicks = fromIntegral clk_tck
+##endif

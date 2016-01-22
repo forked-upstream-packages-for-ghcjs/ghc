@@ -71,6 +71,7 @@ Library
         GHC.Integer.Type
 
     c-sources: cbits/cbits.c
+               cbits/gmp-wrappers.cmm
     include-dirs: include
 
     build-depends: ghc-prim == 0.4.*

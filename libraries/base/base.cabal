@@ -50,7 +50,7 @@ Flag integer-simple
 Flag integer-gmp
     Description: Use integer-gmp
     Manual: True
-    Default: False
+    Default: True
 
 Flag integer-gmp2
     Description: Use integer-gmp2
@@ -325,7 +325,7 @@ Library
         Typeable.h
 
     -- OS Specific
-    if os(windows)
+    if os(windows) && !impl(ghcjs)
         extra-libraries: wsock32, user32, shell32
         exposed-modules:
             GHC.IO.Encoding.CodePage.API
@@ -333,23 +333,24 @@ Library
             GHC.Conc.Windows
             GHC.Windows
     else
-        exposed-modules:
-            GHC.Event
-        other-modules:
-            GHC.Event.Arr
-            GHC.Event.Array
-            GHC.Event.Clock
-            GHC.Event.Control
-            GHC.Event.EPoll
-            GHC.Event.IntTable
-            GHC.Event.Internal
-            GHC.Event.KQueue
-            GHC.Event.Manager
-            GHC.Event.PSQ
-            GHC.Event.Poll
-            GHC.Event.Thread
-            GHC.Event.TimerManager
-            GHC.Event.Unique
+        if !impl(ghcjs)
+            exposed-modules:
+                GHC.Event
+            other-modules:
+                GHC.Event.Arr
+                GHC.Event.Array
+                GHC.Event.Clock
+                GHC.Event.Control
+                GHC.Event.EPoll
+                GHC.Event.IntTable
+                GHC.Event.Internal
+                GHC.Event.KQueue
+                GHC.Event.Manager
+                GHC.Event.PSQ
+                GHC.Event.Poll
+                GHC.Event.Thread
+                GHC.Event.TimerManager
+                GHC.Event.Unique
 
     -- We need to set the package key to base (without a version number)
     -- as it's magic.

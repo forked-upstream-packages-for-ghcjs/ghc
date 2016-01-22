@@ -6,21 +6,29 @@ module Main (main) where
 import Control.Monad
 import Data.List
 import Data.Maybe
+import Distribution.ModuleName (components)
 import Distribution.PackageDescription
 import Distribution.Simple
 import Distribution.Simple.LocalBuildInfo
 import Distribution.Simple.Program
 import Distribution.Simple.Utils
+import Distribution.Simple.Setup
+import Distribution.Simple.Register
+import Distribution.Simple.Install
 import Distribution.Text
 import System.Cmd
 import System.FilePath
 import System.Exit
 import System.Directory
 
+import qualified Data.ByteString               as B
+import qualified Distribution.Compat.Exception as E
+
 main :: IO ()
 main = do let hooks = simpleUserHooks {
                   regHook = addPrimModule
                           $ regHook simpleUserHooks,
+                  instHook = myInstHook,
                   buildHook = build_primitive_sources
                             $ buildHook simpleUserHooks,
                   haddockHook = addPrimModuleForHaddock
@@ -58,31 +66,55 @@ addPrimModuleToPD pd =
 
 build_primitive_sources :: Hook a -> Hook a
 build_primitive_sources f pd lbi uhs x
- = do when (compilerFlavor (compiler lbi) == GHC) $ do
+ = do when (compilerFlavor (compiler lbi) == GHC ||
+            compilerFlavor (compiler lbi) == GHCJS) $ do
           let genprimopcode = joinPath ["..", "..", "utils",
                                         "genprimopcode", "genprimopcode"]
-              primops = joinPath ["..", "..", "compiler", "prelude",
-                                  "primops.txt"]
+              runGenprimopcode options tmp out = do
+                writeFile tmp "{-# LANGUAGE CPP #-}\n#ifdef ghcjs_HOST_OS\n"
+                maybeExit $ system (genprimopcode ++ options ++ " < " ++ primops ++ " >> " ++ tmp)
+                appendFile tmp "\n#else\n"
+                maybeExit $ system (genprimopcode ++ options ++ " < " ++ primops_native ++ " >> " ++ tmp)
+                appendFile tmp "\n#endif\n"
+                maybeUpdateFile tmp out
+              primops = joinPath ["..", "..", "data", "primops-js.txt"]
+              primops_native = joinPath ["..", "..", "data", "primops-native.txt"]
               primhs = joinPath ["GHC", "Prim.hs"]
               primopwrappers = joinPath ["GHC", "PrimopWrappers.hs"]
               primhs_tmp = addExtension primhs "tmp"
               primopwrappers_tmp = addExtension primopwrappers "tmp"
-          maybeExit $ system (genprimopcode ++ " --make-haskell-source < "
-                           ++ primops ++ " > " ++ primhs_tmp)
-          maybeUpdateFile primhs_tmp primhs
-          maybeExit $ system (genprimopcode ++ " --make-haskell-wrappers < "
-                           ++ primops ++ " > " ++ primopwrappers_tmp)
-          maybeUpdateFile primopwrappers_tmp primopwrappers
+          runGenprimopcode " --make-haskell-source"   primhs_tmp primhs
+          runGenprimopcode " --make-haskell-wrappers" primopwrappers_tmp primopwrappers
       f pd lbi uhs x
 
 -- Replace a file only if the new version is different from the old.
 -- This prevents make from doing unnecessary work after we run 'setup makefile'
 maybeUpdateFile :: FilePath -> FilePath -> IO ()
 maybeUpdateFile source target = do
-  r <- rawSystem "cmp" ["-s" {-quiet-}, source, target]
-  case r of
-    ExitSuccess   -> removeFile source
-    ExitFailure _ -> do exists <- doesFileExist target
-                        when exists $ removeFile target
-                        renameFile source target
+  let readf file = fmap (either (const Nothing) Just) (E.tryIO $ B.readFile file)
+  s <- readf source
+  t <- readf  target
+  if isJust s && s == t
+    then removeFile source
+    else do doesFileExist target >>= flip when (removeFile target)
+            renameFile source target
+
+myInstHook :: PackageDescription -> LocalBuildInfo
+                   -> UserHooks -> InstallFlags -> IO ()
+myInstHook pkg_descr localbuildinfo uh flags = do
+  let copyFlags = defaultCopyFlags {
+                      copyDistPref   = installDistPref flags,
+                      copyDest       = toFlag NoCopyDest,
+                      copyVerbosity  = installVerbosity flags
+                  }
+  install pkg_descr localbuildinfo copyFlags
+  let registerFlags = defaultRegisterFlags {
+                          regDistPref  = installDistPref flags,
+                          regInPlace   = installInPlace flags,
+                          regPackageDB = installPackageDB flags,
+                          regVerbosity = installVerbosity flags
+                      }
+  when (hasLibs pkg_descr) $ addPrimModule (\pd lbi _ -> register pd lbi)
+     pkg_descr localbuildinfo uh registerFlags
+
 

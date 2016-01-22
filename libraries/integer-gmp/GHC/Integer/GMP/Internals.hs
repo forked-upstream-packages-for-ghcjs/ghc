@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude, MagicHash, CPP #-}
 
 -- | This modules provides access to the 'Integer' constructors and
 -- exposes some highly optimized GMP-operations.
@@ -13,7 +13,11 @@
 
 module GHC.Integer.GMP.Internals
     ( -- * The 'Integer' type
+#ifdef ghcjs_HOST_OS
+      Integer(S#)
+#else
       Integer(..)
+#endif
 
       -- * Number theoretic functions
     , gcdInt

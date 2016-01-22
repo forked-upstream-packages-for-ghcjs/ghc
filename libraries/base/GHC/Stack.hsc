@@ -15,7 +15,7 @@
 -- @since 4.5.0.0
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE UnboxedTuples, MagicHash, NoImplicitPrelude #-}
+{-# LANGUAGE CPP, UnboxedTuples, MagicHash, NoImplicitPrelude #-}
 module GHC.Stack (
     -- * Call stack
     currentCallStack,
@@ -63,6 +63,22 @@ getCCSOf obj = IO $ \s ->
    case getCCSOf## obj s of
      (## s', addr ##) -> (## s', Ptr addr ##)
 
+##ifdef ghcjs_HOST_OS
+ccsCC :: Ptr CostCentreStack -> IO (Ptr CostCentre)
+ccsCC p = peekByteOff p 4
+
+ccsParent :: Ptr CostCentreStack -> IO (Ptr CostCentreStack)
+ccsParent p = peekByteOff p 8
+
+ccLabel :: Ptr CostCentre -> IO CString
+ccLabel p = peekByteOff p 4
+
+ccModule :: Ptr CostCentre -> IO CString
+ccModule p = peekByteOff p 8
+
+ccSrcSpan :: Ptr CostCentre -> IO CString
+ccSrcSpan p = peekByteOff p 12
+##else
 ccsCC :: Ptr CostCentreStack -> IO (Ptr CostCentre)
 ccsCC p = (# peek CostCentreStack, cc) p
 
@@ -77,6 +93,7 @@ ccModule p = (# peek CostCentre, module) p
 
 ccSrcSpan :: Ptr CostCentre -> IO CString
 ccSrcSpan p = (# peek CostCentre, srcloc) p
+##endif
 
 -- | returns a '[String]' representing the current call stack.  This
 -- can be useful for debugging.

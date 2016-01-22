@@ -8,6 +8,9 @@
   #-}
 
 module GHC.Event.TimerManager
+#ifdef ghcjs_HOST_OS
+    () where
+#else
     ( -- * Types
       TimerManager
 
@@ -241,3 +244,4 @@ updateTimeout mgr (TK key) us = do
 editTimeouts :: TimerManager -> TimeoutEdit -> IO ()
 editTimeouts mgr g = atomicModifyIORef' (emTimeouts mgr) $ \tq -> (g tq, ())
 
+#endif

@@ -118,7 +118,11 @@ default ()
 -- @MP_INT_1LIMB_RETURN()@ macro in @gmp-wrappers.cmm@ which
 -- constructs 'MPZ#' values in the first place for implementation
 -- details.
+#ifdef ghcjs_HOST_OS
+type MPZ# = ByteArray#
+#else
 type MPZ# = (# Int#, ByteArray#, Word# #)
+#endif
 
 -- | Returns -1,0,1 according as first argument is less than, equal to, or greater than second argument.
 --
@@ -360,6 +364,10 @@ foreign import ccall unsafe "hs_integerToWord64"
 #endif
 
 -- used to be primops:
+#ifdef ghcjs_HOST_OS
+foreign import prim "integer_cmm_integer2Intzh" integer2Int#
+   :: Int# -> ByteArray# -> Int#
+#else
 integer2Int# :: Int# -> ByteArray# -> Int#
 integer2Int# s d = if isTrue# (s ==# 0#)
                        then 0#
@@ -367,6 +375,7 @@ integer2Int# s d = if isTrue# (s ==# 0#)
                             if isTrue# (s <# 0#)
                                then negateInt# v
                                else v
+#endif
 
 integer2Word# :: Int# -> ByteArray# -> Word#
 integer2Word# s d = int2Word# (integer2Int# s d)

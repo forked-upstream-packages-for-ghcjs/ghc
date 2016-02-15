@@ -18,7 +18,8 @@ description:
     .
     For more details about the design of @integer-gmp@, see
     <https://ghc.haskell.org/trac/ghc/wiki/Commentary/Libraries/Integer GHC Commentary: Libraries/Integer>.
-build-type:     Configure
+-- TODO Make based off impl(ghcjs)
+build-type:     Simple
 cabal-version:  >=1.10
 
 extra-source-files:
@@ -70,9 +71,10 @@ Library
     other-modules:
         GHC.Integer.Type
 
-    c-sources: cbits/cbits.c
-               cbits/gmp-wrappers.cmm
-    include-dirs: include
+    if impl(ghcjs)
+        c-sources: cbits/cbits.c
+                   cbits/gmp-wrappers.cmm
+        include-dirs: include
 
     build-depends: ghc-prim == 0.4.*
 

@@ -21,7 +21,10 @@
 --
 
 #include "MachDeps.h"
+
+#ifndef ghcjs_HOST_OS
 #include "HsIntegerGmp.h"
+#endif
 
 #if SIZEOF_HSWORD == 4
 #define INT_MINBOUND (-2147483648#)

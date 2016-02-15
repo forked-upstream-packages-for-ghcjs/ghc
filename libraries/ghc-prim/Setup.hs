@@ -69,7 +69,7 @@ build_primitive_sources f pd lbi uhs x
  = do when (compilerFlavor (compiler lbi) == GHC ||
             compilerFlavor (compiler lbi) == GHCJS) $ do
           let genprimopcode = "genprimopcode"
-              primops = joinPath ["..", "..", "data", "primops-js.txt"]
+              primops = "primops.txt"
               primhs = joinPath ["GHC", "Prim.hs"]
               primopwrappers = joinPath ["GHC", "PrimopWrappers.hs"]
               primhs_tmp = addExtension primhs "tmp"

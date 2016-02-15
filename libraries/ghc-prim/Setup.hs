@@ -68,8 +68,7 @@ build_primitive_sources :: Hook a -> Hook a
 build_primitive_sources f pd lbi uhs x
  = do when (compilerFlavor (compiler lbi) == GHC ||
             compilerFlavor (compiler lbi) == GHCJS) $ do
-          let genprimopcode = joinPath ["..", "..", "utils",
-                                        "genprimopcode", "genprimopcode"]
+          let genprimopcode = "genprimopcode"
               runGenprimopcode options tmp out = do
                 writeFile tmp "{-# LANGUAGE CPP #-}\n#ifdef ghcjs_HOST_OS\n"
                 maybeExit $ system (genprimopcode ++ options ++ " < " ++ primops ++ " >> " ++ tmp)

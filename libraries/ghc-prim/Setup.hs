@@ -69,21 +69,17 @@ build_primitive_sources f pd lbi uhs x
  = do when (compilerFlavor (compiler lbi) == GHC ||
             compilerFlavor (compiler lbi) == GHCJS) $ do
           let genprimopcode = "genprimopcode"
-              runGenprimopcode options tmp out = do
-                writeFile tmp "{-# LANGUAGE CPP #-}\n#ifdef ghcjs_HOST_OS\n"
-                maybeExit $ system (genprimopcode ++ options ++ " < " ++ primops ++ " >> " ++ tmp)
-                appendFile tmp "\n#else\n"
-                maybeExit $ system (genprimopcode ++ options ++ " < " ++ primops_native ++ " >> " ++ tmp)
-                appendFile tmp "\n#endif\n"
-                maybeUpdateFile tmp out
               primops = joinPath ["..", "..", "data", "primops-js.txt"]
-              primops_native = joinPath ["..", "..", "data", "primops-native.txt"]
               primhs = joinPath ["GHC", "Prim.hs"]
               primopwrappers = joinPath ["GHC", "PrimopWrappers.hs"]
               primhs_tmp = addExtension primhs "tmp"
               primopwrappers_tmp = addExtension primopwrappers "tmp"
-          runGenprimopcode " --make-haskell-source"   primhs_tmp primhs
-          runGenprimopcode " --make-haskell-wrappers" primopwrappers_tmp primopwrappers
+          maybeExit $ system (genprimopcode ++ " --make-haskell-source < "
+                           ++ primops ++ " > " ++ primhs_tmp)
+          maybeUpdateFile primhs_tmp primhs
+          maybeExit $ system (genprimopcode ++ " --make-haskell-wrappers < "
+                           ++ primops ++ " > " ++ primopwrappers_tmp)
+          maybeUpdateFile primopwrappers_tmp primopwrappers
       f pd lbi uhs x
 
 -- Replace a file only if the new version is different from the old.

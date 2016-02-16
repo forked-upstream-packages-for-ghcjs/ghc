@@ -71,10 +71,11 @@ Library
     other-modules:
         GHC.Integer.Type
 
-    if impl(ghcjs)
+    if !impl(ghcjs)
         c-sources: cbits/cbits.c
                    cbits/gmp-wrappers.cmm
-        include-dirs: include
+
+    include-dirs: include
 
     build-depends: ghc-prim == 0.4.*
 

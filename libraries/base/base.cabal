@@ -302,19 +302,20 @@ Library
         Foreign.ForeignPtr.Imp
         System.Environment.ExecutablePath
 
-    c-sources:
-        cbits/DarwinUtils.c
-        cbits/PrelIOUtils.c
-        cbits/SetEnv.c
-        cbits/WCsubst.c
-        cbits/Win32Utils.c
-        cbits/consUtils.c
-        cbits/iconv.c
-        cbits/inputReady.c
-        cbits/md5.c
-        cbits/primFloat.c
-        cbits/rts.c
-        cbits/sysconf.c
+    if !impl(ghcjs)
+        c-sources:
+            cbits/DarwinUtils.c
+            cbits/PrelIOUtils.c
+            cbits/SetEnv.c
+            cbits/WCsubst.c
+            cbits/Win32Utils.c
+            cbits/consUtils.c
+            cbits/iconv.c
+            cbits/inputReady.c
+            cbits/md5.c
+            cbits/primFloat.c
+            cbits/rts.c
+            cbits/sysconf.c
 
     include-dirs: include
     includes:
@@ -333,25 +334,25 @@ Library
             GHC.IO.Encoding.CodePage.Table
             GHC.Conc.Windows
             GHC.Windows
-    else
-        if !impl(ghcjs)
-            exposed-modules:
-                GHC.Event
-            other-modules:
-                GHC.Event.Arr
-                GHC.Event.Array
-                GHC.Event.Clock
-                GHC.Event.Control
-                GHC.Event.EPoll
-                GHC.Event.IntTable
-                GHC.Event.Internal
-                GHC.Event.KQueue
-                GHC.Event.Manager
-                GHC.Event.PSQ
-                GHC.Event.Poll
-                GHC.Event.Thread
-                GHC.Event.TimerManager
-                GHC.Event.Unique
+
+    if !os(windows) && !impl(ghcjs)
+        exposed-modules:
+            GHC.Event
+        other-modules:
+            GHC.Event.Arr
+            GHC.Event.Array
+            GHC.Event.Clock
+            GHC.Event.Control
+            GHC.Event.EPoll
+            GHC.Event.IntTable
+            GHC.Event.Internal
+            GHC.Event.KQueue
+            GHC.Event.Manager
+            GHC.Event.PSQ
+            GHC.Event.Poll
+            GHC.Event.Thread
+            GHC.Event.TimerManager
+            GHC.Event.Unique
 
     -- We need to set the package key to base (without a version number)
     -- as it's magic.

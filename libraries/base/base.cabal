@@ -12,7 +12,8 @@ description:
     and a large collection of useful libraries ranging from data
     structures to parsing combinators and debugging utilities.
 cabal-version:  >=1.10
-build-type:     Configure
+-- TODO Make based off impl(ghcjs)
+build-type:     Simple
 
 extra-tmp-files:
     autom4te.cache
